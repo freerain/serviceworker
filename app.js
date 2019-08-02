@@ -190,6 +190,7 @@ function sendNotification(notification) {
     info.hide();
     massage_row.hide();
 
+
     messaging.getToken()
         .then(function(currentToken) {
             fetch('https://fcm.googleapis.com/fcm/send', {
@@ -223,6 +224,50 @@ function sendNotification(notification) {
         .catch(function(error) {
             showError('Error retrieving Instance ID token', error);
         });
+		
+		if ($('#text_all').val()!="")
+
+			{
+				
+				
+				messaging.getToken()
+        .then(function(currentToken) {
+            fetch('https://fcm.googleapis.com/fcm/send', {
+                method: 'POST',
+                headers: {
+                    'Authorization': 'key=' + key,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    // Firebase loses 'image' from the notification.
+                    // And you must see this: https://github.com/firebase/quickstart-js/issues/71
+                    data: notification,
+                    to: $('#text_all').val()
+                })
+            }).then(function(response) {
+                return response.json();
+            }).then(function(json) {
+                console.log('Response', json);
+
+                if (json.success === 1) {
+                    massage_row.show();
+                    massage_id.text(json.results[0].message_id);
+                } else {
+                    massage_row.hide();
+                    massage_id.text(json.results[0].error);
+                }
+            }).catch(function(error) {
+                showError(error);
+            });
+        })
+        .catch(function(error) {
+            showError('Error retrieving Instance ID token', error);
+        });
+				
+				
+				
+			}
+		
 }
 
 // Send the Instance ID token your application server, so that it can:
